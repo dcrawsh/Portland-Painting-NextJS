@@ -34,7 +34,7 @@ if (!payload?.id) {
 
 const fetchedReviews = Array.isArray(payload.reviews)
   ? payload.reviews
-      .filter((review) => (review.rating ?? 0) >= 4)
+      .filter((review) => review.rating === 5)
       .map((review) => ({
         author_name: review.authorAttribution?.displayName,
         profile_photo_url: review.authorAttribution?.photoUri,
@@ -52,7 +52,7 @@ let savedReviews = [];
 try {
   const savedSnapshot = JSON.parse(await readFile(outputPath, "utf8"));
   savedReviews = Array.isArray(savedSnapshot.reviews)
-    ? savedSnapshot.reviews.filter((review) => (review.rating ?? 0) >= 4)
+    ? savedSnapshot.reviews.filter((review) => review.rating === 5)
     : [];
 } catch (error) {
   if (error?.code !== "ENOENT") {
