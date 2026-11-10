@@ -8,6 +8,7 @@ export interface BlogMeta {
   description: string;
   date: string;
   image: string;
+  published?: boolean;
 }
 
 export interface BlogPost extends BlogMeta {
