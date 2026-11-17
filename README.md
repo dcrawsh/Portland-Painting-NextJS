@@ -32,6 +32,18 @@ yarn build           # Create a production build
 yarn start           # Serve a completed production build
 ```
 
+## Project Stories Admin
+
+Generate a hashed shared password and a session-signing secret:
+
+```bash
+yarn admin:setup
+```
+
+Copy the two generated values into `.env.local`, restart the development
+server, and open [http://localhost:3000/admin](http://localhost:3000/admin).
+Admin sessions expire after three hours. Never commit the generated values.
+
 ## Google Reviews Setup
 
 Set these variables in `.env.local`:
