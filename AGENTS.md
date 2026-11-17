@@ -251,3 +251,18 @@ A change is complete when:
 - Keep changes scoped to the request; do not reformat unrelated files.
 - Update this guide and the README when setup, commands, integrations, or the
   repository layout changes.
+
+## Branches and pull requests
+
+- Start each new update on a descriptive branch using the `codex/` prefix,
+  such as `codex/add-project-gallery` or `codex/improve-admin-editing`.
+- Keep one coherent update per branch. Do not mix unrelated work into the same
+  pull request.
+- Before opening a pull request, run the validation appropriate to the change
+  and review the complete diff for secrets, generated files, and unrelated
+  edits.
+- Open a pull request for every completed update unless the user explicitly
+  asks to keep the work local.
+- Use a concise, descriptive pull request title. In the description, summarize
+  what changed, list the checks performed, and call out any setup steps or
+  follow-up work.
