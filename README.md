@@ -44,6 +44,18 @@ Copy the two generated values into `.env.local`, restart the development
 server, and open [http://localhost:3000/admin](http://localhost:3000/admin).
 Admin sessions expire after three hours. Never commit the generated values.
 
+The Project Stories editor also requires these Supabase values in `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+SUPABASE_SECRET_KEY=your-server-only-secret-key
+```
+
+Find the URL and API keys in the Supabase project’s **Connect** dialog or under
+**Settings → API Keys**. The secret key must remain server-only and must never
+use a `NEXT_PUBLIC_` prefix.
+
 ## Google Reviews Setup
 
 Set these variables in `.env.local`:
