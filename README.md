@@ -1,18 +1,40 @@
 # Portland-Painting-NextJS
 
-Repo for Portland Painting and Restoration Next.js site.
+The Portland Painting and Restoration website, built with Next.js 15, React,
+and TypeScript.
+
+## Requirements
+
+- Node.js 22.x
+- Yarn 1.22.22
 
 ## Getting Started
 
 ```bash
-npm run dev
+yarn install --frozen-lockfile
+cp .env.example .env.local
+yarn dev
 ```
 
-Open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000).
+
+Most pages work without integration credentials. Add only the variables needed
+for the feature you are developing to `.env.local`; see `.env.example` for the
+complete list.
+
+## Commands
+
+```bash
+yarn dev             # Start the local development server
+yarn lint            # Run ESLint
+yarn tsc --noEmit    # Run the TypeScript checker
+yarn build           # Create a production build
+yarn start           # Serve a completed production build
+```
 
 ## Google Reviews Setup
 
-Add these variables to your local environment:
+Set these variables in `.env.local`:
 
 ```bash
 GOOGLE_MAPS_API_KEY=your-google-maps-api-key
@@ -20,3 +42,20 @@ GOOGLE_PLACE_ID=your-google-business-place-id
 ```
 
 The reviews page uses Google Places Details API on the server and falls back to local reviews if either value is missing.
+
+To refresh the checked-in reviews snapshot manually, run:
+
+```bash
+node scripts/fetch-google-reviews.mjs
+```
+
+## Other Integrations
+
+The form and subscription API routes can also use Asana, SMTP email,
+Mailchimp, and reCAPTCHA. Their environment-variable names are documented in
+`.env.example`. Never commit real credentials.
+
+## Working With Agents
+
+Repository structure, validation expectations, and change conventions are in
+`AGENTS.md`.
