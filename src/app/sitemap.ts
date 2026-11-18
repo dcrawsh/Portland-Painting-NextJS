@@ -24,6 +24,7 @@ const staticRoutes = [
   "/about-us/reviews",
   "/save-the-planet",
   "/trade-show",
+  "/resources",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -35,20 +36,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   if (!isSupabasePublicConfigured()) return staticEntries;
 
-  const { data: projects, error } = await createSupabasePublicClient()
-    .from("project_stories")
-    .select("slug, updated_at")
-    .eq("status", "published")
-    .lte("published_at", now.toISOString())
-    .order("published_at", { ascending: false });
+  const supabase = createSupabasePublicClient();
+  const [projectResult, resourceResult] = await Promise.all([
+    supabase.from("project_stories").select("slug, updated_at").eq("status", "published").lte("published_at", now.toISOString()).order("published_at", { ascending: false }),
+    supabase.from("resource_pages").select("slug, updated_at").eq("status", "published").lte("published_at", now.toISOString()).order("published_at", { ascending: false }),
+  ]);
 
-  if (error) return staticEntries;
+  if (projectResult.error || resourceResult.error) return staticEntries;
 
   return [
     ...staticEntries,
-    ...(projects ?? []).map((project) => ({
+    ...(projectResult.data ?? []).map((project) => ({
       url: `${baseUrl}/projects/${project.slug}`,
       lastModified: new Date(project.updated_at),
+    })),
+    ...(resourceResult.data ?? []).map((resource) => ({
+      url: `${baseUrl}/resources/${resource.slug}`,
+      lastModified: new Date(resource.updated_at),
     })),
   ];
 }

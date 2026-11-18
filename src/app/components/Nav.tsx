@@ -232,6 +232,14 @@ export default function Nav() {
 
             <li>
               <Link
+                href="/resources"
+                className={`hover:text-black transition ${pathname.startsWith("/resources") ? "text-black" : ""}`}
+              >
+                Resources
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/contact"
                 className={`hover:text-black transition ${pathname === "/contact" ? "text-black" : ""
                   }`}
@@ -529,6 +537,15 @@ export default function Nav() {
               </ul>
             </li>
 
+            <li>
+              <Link
+                href="/resources"
+                onClick={toggleMenu}
+                className={`block transition ${pathname.startsWith("/resources") ? "text-black" : ""}`}
+              >
+                Resources
+              </Link>
+            </li>
             <li>
               <Link
                 href="/contact"

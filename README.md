@@ -60,6 +60,10 @@ Draft project stories are available only through the protected admin preview.
 Publishing a story makes it available at `/projects/[slug]` and adds it to the
 public sitemap. Returning a published story to draft removes public access.
 
+The Resource & Information Center follows the same draft and publishing model.
+Its pages are HTML-first, with optional photography, PDF downloads, and links
+back to related service pages.
+
 ## Google Reviews Setup
 
 Set these variables in `.env.local`:
