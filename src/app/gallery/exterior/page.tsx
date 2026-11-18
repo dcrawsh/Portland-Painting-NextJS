@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import imageFiles from "./galleryFiles";
-import MasonryGallery from "../../components/ImageGallery/MasonryGallery";
+import PortfolioGallery from "../../components/ImageGallery/PortfolioGallery";
 import Link from "next/link";
 import Script from "next/script";
 
@@ -104,7 +104,7 @@ export default async function ExteriorGalleryPage() {
           <p className="pb-4 pt-4">At Portland Painting and Restoration, we excel in both exterior painting and carpentry services to protect and beautify your property. Our professional painters deliver a consistent, durable finish that withstands the Pacific Northwest’s challenging weather. Simultaneously, our skilled carpenters address any structural issues, ensuring your exterior is not only visually stunning but also robust and secure.</p>
         </div>
       </div>
-      <MasonryGallery images={imageFiles} />
+      <PortfolioGallery images={imageFiles} label="Exterior painting project" />
     </>
   );
 }
