@@ -8,6 +8,7 @@ import {
   createSignedProjectImageUpload,
   deleteProjectImage,
   finalizeProjectImageUpload,
+  updateProjectImageDescription,
 } from "./image-actions";
 
 const acceptedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -120,12 +121,27 @@ export default function ProjectPhotoManager({
   const [isProcessing, setIsProcessing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [savingId, setSavingId] = useState<number | null>(null);
+  const [descriptionDrafts, setDescriptionDrafts] = useState<
+    Record<number, string>
+  >(() => Object.fromEntries(images.map((image) => [image.id, image.alt_text])));
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     pendingPhotosRef.current = pendingPhotos;
   }, [pendingPhotos]);
+
+  useEffect(() => {
+    setDescriptionDrafts((current) =>
+      Object.fromEntries(
+        images.map((image) => [
+          image.id,
+          current[image.id] ?? image.alt_text,
+        ])
+      )
+    );
+  }, [images]);
 
   useEffect(() => {
     return () => {
@@ -283,6 +299,37 @@ export default function ProjectPhotoManager({
     router.refresh();
   }
 
+  async function saveImageDescription(image: ProjectImageWithUrl) {
+    const description = (descriptionDrafts[image.id] ?? "").trim();
+    setError(null);
+    setMessage(null);
+
+    if (description.length < 3) {
+      setError("Photo descriptions must be at least 3 characters.");
+      return;
+    }
+
+    setSavingId(image.id);
+    const result = await updateProjectImageDescription(
+      projectId,
+      image.id,
+      description
+    );
+    setSavingId(null);
+
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+
+    setDescriptionDrafts((current) => ({
+      ...current,
+      [image.id]: description,
+    }));
+    setMessage("Photo description saved.");
+    router.refresh();
+  }
+
   const spacesRemaining = maximumImages - images.length - pendingPhotos.length;
 
   return (
@@ -317,18 +364,50 @@ export default function ProjectPhotoManager({
                   width={image.width ?? 1200}
                 />
               </div>
-              <div className="mt-3 flex items-start justify-between gap-4">
-                <figcaption className="text-sm leading-5 text-[#20231F]/70">
-                  {image.alt_text}
+              <figcaption className="mt-3">
+                <label
+                  className="block text-sm font-medium text-[#20231F]"
+                  htmlFor={`image-description-${image.id}`}
+                >
+                  Image description
                   {image.is_cover ? (
                     <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[#687760]">
                       Cover
                     </span>
                   ) : null}
-                </figcaption>
+                </label>
+                <textarea
+                  className="mt-2 w-full border border-[#20231F]/30 bg-white px-3 py-2 text-sm leading-5 outline-none focus:border-[#17352B] focus:ring-2 focus:ring-[#17352B]/20"
+                  id={`image-description-${image.id}`}
+                  maxLength={240}
+                  onChange={(event) =>
+                    setDescriptionDrafts((current) => ({
+                      ...current,
+                      [image.id]: event.target.value,
+                    }))
+                  }
+                  rows={2}
+                  value={descriptionDrafts[image.id] ?? image.alt_text}
+                />
+              </figcaption>
+              <div className="mt-3 flex items-center justify-between gap-4">
+                <button
+                  className="border border-[#17352B] px-3 py-2 text-sm font-semibold text-[#17352B] transition hover:bg-[#F2EEE5] disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={
+                    savingId !== null ||
+                    deletingId !== null ||
+                    isUploading ||
+                    (descriptionDrafts[image.id] ?? "").trim().length < 3 ||
+                    (descriptionDrafts[image.id] ?? "").trim() === image.alt_text
+                  }
+                  onClick={() => saveImageDescription(image)}
+                  type="button"
+                >
+                  {savingId === image.id ? "Saving…" : "Save description"}
+                </button>
                 <button
                   className="shrink-0 text-sm font-medium text-[#7A3525] underline decoration-[#7A3525]/35 underline-offset-4 hover:decoration-[#7A3525] disabled:opacity-50"
-                  disabled={deletingId !== null || isUploading}
+                  disabled={deletingId !== null || savingId !== null || isUploading}
                   onClick={() => removeUploadedPhoto(image)}
                   type="button"
                 >

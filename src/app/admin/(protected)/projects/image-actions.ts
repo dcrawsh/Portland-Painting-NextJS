@@ -253,3 +253,38 @@ export async function deleteProjectImage(
   await revalidateProject(projectId);
   return { ok: true };
 }
+
+export async function updateProjectImageDescription(
+  projectId: number,
+  imageId: number,
+  altText: string
+): Promise<ImageActionResult> {
+  await requireAdminSession();
+
+  const description = altText.trim();
+  if (
+    !isValidProjectId(projectId) ||
+    !Number.isSafeInteger(imageId) ||
+    imageId < 1 ||
+    description.length < 3 ||
+    description.length > 240 ||
+    !isSupabaseAdminConfigured()
+  ) {
+    return { ok: false, error: "The photo description is invalid." };
+  }
+
+  const { data, error } = await createSupabaseAdminClient()
+    .from("project_story_images")
+    .update({ alt_text: description })
+    .eq("id", imageId)
+    .eq("project_story_id", projectId)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !data) {
+    return { ok: false, error: "The photo description could not be saved." };
+  }
+
+  await revalidateProject(projectId);
+  return { ok: true };
+}
