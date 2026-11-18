@@ -62,7 +62,9 @@ public sitemap. Returning a published story to draft removes public access.
 
 The Resource & Information Center follows the same draft and publishing model.
 Its pages are HTML-first, with optional photography, PDF downloads, and links
-back to related service pages.
+back to related service pages. While the section is in beta, resource routes
+are available by direct link but excluded from navigation, crawling, and the
+public sitemap.
 
 ## Google Reviews Setup
 
