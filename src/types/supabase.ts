@@ -171,5 +171,7 @@ export type Database = {
 
 export type ProjectStory =
   Database["public"]["Tables"]["project_stories"]["Row"];
+export type ProjectStoryImage =
+  Database["public"]["Tables"]["project_story_images"]["Row"];
 export type ResourcePage =
   Database["public"]["Tables"]["resource_pages"]["Row"];

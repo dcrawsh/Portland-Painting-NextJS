@@ -1,6 +1,10 @@
 import type { ProjectStory } from "@/types/supabase";
+import ProjectStoryGallery, {
+  type ProjectStoryDisplayImage,
+} from "./ProjectStoryGallery";
 
 type ProjectStoryContentProps = {
+  images?: ProjectStoryDisplayImage[];
   project: ProjectStory;
 };
 
@@ -20,6 +24,7 @@ function formatProjectDate(value: string) {
 }
 
 export default function ProjectStoryContent({
+  images = [],
   project,
 }: ProjectStoryContentProps) {
   const details = [
@@ -48,6 +53,10 @@ export default function ProjectStoryContent({
           </p>
         ) : null}
       </header>
+
+      {images.length > 0 ? (
+        <ProjectStoryGallery images={images} />
+      ) : null}
 
       <div className="divide-y divide-[#20231F]/15">
         {storySections.map(([field, heading]) =>

@@ -3,6 +3,7 @@ import {
   isSupabaseAdminConfigured,
 } from "@/lib/supabase/admin";
 import ProjectStoryContent from "@/app/components/ProjectStoryContent";
+import type { ProjectStoryDisplayImage } from "@/app/components/ProjectStoryGallery";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
@@ -18,13 +19,26 @@ export default async function ProjectPreviewPage({
   const id = Number((await params).id);
   if (!Number.isSafeInteger(id) || id < 1) notFound();
 
-  const { data: project, error } = await createSupabaseAdminClient()
-    .from("project_stories")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  const supabase = createSupabaseAdminClient();
+  const [{ data: project, error }, { data: imageRows, error: imagesError }] =
+    await Promise.all([
+      supabase.from("project_stories").select("*").eq("id", id).maybeSingle(),
+      supabase
+        .from("project_story_images")
+        .select("*")
+        .eq("project_story_id", id)
+        .order("is_cover", { ascending: false })
+        .order("sort_order", { ascending: true }),
+    ]);
 
-  if (error || !project) notFound();
+  if (error || imagesError || !project) notFound();
+
+  const images: ProjectStoryDisplayImage[] = (imageRows ?? []).map((image) => ({
+    ...image,
+    publicUrl: supabase.storage
+      .from("project-images")
+      .getPublicUrl(image.storage_path).data.publicUrl,
+  }));
 
   return (
     <article className="mx-auto max-w-4xl px-6 py-12">
@@ -58,7 +72,7 @@ export default async function ProjectPreviewPage({
       </div>
 
       <div className="mt-8">
-        <ProjectStoryContent project={project} />
+        <ProjectStoryContent images={images} project={project} />
       </div>
     </article>
   );
