@@ -1,7 +1,9 @@
-import type { ProjectStory } from "@/types/supabase";
-import ProjectStoryGallery, {
-  type ProjectStoryDisplayImage,
-} from "./ProjectStoryGallery";
+import type { ProjectStory, ProjectStoryImage } from "@/types/supabase";
+import PortfolioGallery from "./ImageGallery/PortfolioGallery";
+
+export type ProjectStoryDisplayImage = ProjectStoryImage & {
+  publicUrl: string;
+};
 
 type ProjectStoryContentProps = {
   images?: ProjectStoryDisplayImage[];
@@ -55,7 +57,16 @@ export default function ProjectStoryContent({
       </header>
 
       {images.length > 0 ? (
-        <ProjectStoryGallery images={images} />
+        <PortfolioGallery
+          embedded
+          images={images.map((image) => ({
+            alt: image.alt_text,
+            caption: image.caption,
+            src: image.publicUrl,
+            unoptimized: true,
+          }))}
+          label={`${project.title} project photos`}
+        />
       ) : null}
 
       <div className="divide-y divide-[#20231F]/15">
