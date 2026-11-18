@@ -18,6 +18,31 @@ const storyFields = [
   ["result", "Finished result"],
 ] as const;
 
+const serviceOptions = [
+  "Interior painting",
+  "Exterior painting",
+  "Carpentry",
+  "Restoration",
+  "Commercial painting",
+  "HOA painting",
+];
+
+const locationOptions = [
+  "Portland",
+  "North Portland",
+  "Northeast Portland",
+  "Northwest Portland",
+  "South Portland",
+  "Southeast Portland",
+  "Southwest Portland",
+  "Vancouver, Washington",
+];
+
+function optionsWithCurrentValue(options: string[], currentValue?: string | null) {
+  if (!currentValue || options.includes(currentValue)) return options;
+  return [currentValue, ...options];
+}
+
 export default function ProjectStoryForm({
   action,
   isNew = false,
@@ -82,27 +107,42 @@ export default function ProjectStoryForm({
           <label className={labelClassName} htmlFor="service_type">
             Service
           </label>
-          <input
+          <select
             className={inputClassName}
             defaultValue={project?.service_type ?? ""}
             id="service_type"
-            maxLength={80}
             name="service_type"
-            placeholder="Exterior painting"
-          />
+          >
+            <option value="">Select a service</option>
+            {optionsWithCurrentValue(
+              serviceOptions,
+              project?.service_type
+            ).map((service) => (
+              <option key={service} value={service}>
+                {service}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label className={labelClassName} htmlFor="location">
             General location
           </label>
-          <input
+          <select
             className={inputClassName}
             defaultValue={project?.location ?? ""}
             id="location"
-            maxLength={120}
             name="location"
-            placeholder="Southeast Portland"
-          />
+          >
+            <option value="">Select a general location</option>
+            {optionsWithCurrentValue(locationOptions, project?.location).map(
+              (location) => (
+                <option key={location} value={location}>
+                  {location}
+                </option>
+              )
+            )}
+          </select>
         </div>
         <div>
           <label className={labelClassName} htmlFor="project_date">
