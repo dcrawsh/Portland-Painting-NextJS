@@ -3,7 +3,7 @@ import {
   isSupabaseAdminConfigured,
 } from "@/lib/supabase/admin";
 import ProjectStoryContent from "@/app/components/ProjectStoryContent";
-import type { ProjectStoryDisplayImage } from "@/app/components/ProjectStoryContent";
+import type { ProjectStoryDisplayImage } from "@/app/components/ProjectStoryGallery";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 

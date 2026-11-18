@@ -1,5 +1,5 @@
 import ProjectStoryContent from "@/app/components/ProjectStoryContent";
-import type { ProjectStoryDisplayImage } from "@/app/components/ProjectStoryContent";
+import type { ProjectStoryDisplayImage } from "@/app/components/ProjectStoryGallery";
 import {
   createSupabasePublicClient,
   isSupabasePublicConfigured,
