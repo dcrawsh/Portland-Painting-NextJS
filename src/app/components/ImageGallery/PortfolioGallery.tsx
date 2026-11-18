@@ -208,19 +208,45 @@ export default function PortfolioGallery({
               <>
                 <button
                   aria-label="Show previous photo"
-                  className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-[#20231F]/30 bg-[#FAF8F3]/95 text-2xl leading-none text-[#17352B] hover:bg-white focus:outline-none focus:ring-2 focus:ring-[#17352B]"
+                  className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#17352B]/35 bg-white/45 text-[#17352B] backdrop-blur-[1px] transition hover:bg-white/75 focus:outline-none focus:ring-2 focus:ring-[#17352B]"
                   onClick={showPrevious}
                   type="button"
                 >
-                  <span aria-hidden="true">←</span>
+                  <svg
+                    aria-hidden="true"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="m15 18-6-6 6-6"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                    />
+                  </svg>
                 </button>
                 <button
                   aria-label="Show next photo"
-                  className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center border border-[#20231F]/30 bg-[#FAF8F3]/95 text-2xl leading-none text-[#17352B] hover:bg-white focus:outline-none focus:ring-2 focus:ring-[#17352B]"
+                  className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#17352B]/35 bg-white/45 text-[#17352B] backdrop-blur-[1px] transition hover:bg-white/75 focus:outline-none focus:ring-2 focus:ring-[#17352B]"
                   onClick={showNext}
                   type="button"
                 >
-                  <span aria-hidden="true">→</span>
+                  <svg
+                    aria-hidden="true"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="m9 18 6-6-6-6"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                    />
+                  </svg>
                 </button>
               </>
             ) : null}
