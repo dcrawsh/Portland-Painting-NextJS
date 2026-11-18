@@ -1,6 +1,11 @@
-import type { ProjectStory } from "@/types/supabase";
+import type { ProjectStory, ProjectStoryImage } from "@/types/supabase";
+
+export type ProjectStoryDisplayImage = ProjectStoryImage & {
+  publicUrl: string;
+};
 
 type ProjectStoryContentProps = {
+  images?: ProjectStoryDisplayImage[];
   project: ProjectStory;
 };
 
@@ -20,6 +25,7 @@ function formatProjectDate(value: string) {
 }
 
 export default function ProjectStoryContent({
+  images = [],
   project,
 }: ProjectStoryContentProps) {
   const details = [
@@ -48,6 +54,38 @@ export default function ProjectStoryContent({
           </p>
         ) : null}
       </header>
+
+      {images.length > 0 ? (
+        <div className="grid gap-4 border-b border-[#20231F]/15 py-8 sm:grid-cols-2">
+          {images.map((image, index) => (
+            <figure
+              className={index === 0 ? "sm:col-span-2" : undefined}
+              key={image.id}
+            >
+              <div
+                className={`${
+                  index === 0 ? "aspect-[16/9]" : "aspect-[4/3]"
+                } overflow-hidden bg-[#E5DFD3]`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  alt={image.alt_text}
+                  className="h-full w-full object-cover"
+                  height={image.height ?? 900}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  src={image.publicUrl}
+                  width={image.width ?? 1200}
+                />
+              </div>
+              {image.caption ? (
+                <figcaption className="mt-2 text-sm leading-5 text-[#20231F]/60">
+                  {image.caption}
+                </figcaption>
+              ) : null}
+            </figure>
+          ))}
+        </div>
+      ) : null}
 
       <div className="divide-y divide-[#20231F]/15">
         {storySections.map(([field, heading]) =>

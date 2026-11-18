@@ -99,14 +99,13 @@ export async function createProjectStory(formData: FormData) {
     redirect(`/admin/projects/new?error=${result.error}`);
   }
 
-  const { payload } = result;
+  const payload: ProjectStoryPayload = { ...result.payload, status: "draft" };
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
     .from("project_stories")
     .insert({
       ...payload,
-      published_at:
-        payload.status === "published" ? new Date().toISOString() : null,
+      published_at: null,
     })
     .select("id")
     .single();
@@ -120,10 +119,7 @@ export async function createProjectStory(formData: FormData) {
   }
 
   revalidatePath("/admin/projects");
-  if (payload.status === "published") {
-    revalidatePath(`/projects/${payload.slug}`);
-  }
-  redirect(`/admin/projects?created=${data.id}`);
+  redirect(`/admin/projects/${data.id}/edit?created=1`);
 }
 
 export async function updateProjectStory(id: number, formData: FormData) {
