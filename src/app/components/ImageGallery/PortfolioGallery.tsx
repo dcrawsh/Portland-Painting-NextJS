@@ -282,7 +282,7 @@ export default function PortfolioGallery({
               {selectedIndex + 1} / {galleryImages.length}
             </span>
           </div>
-          <figcaption className="mt-3 flex items-center justify-between gap-4 text-sm text-[#20231F]/60">
+          <figcaption className="mt-3 flex items-center justify-between gap-4 text-sm text-[#17352B]">
             <span>{selectedImage.caption ?? selectedImage.alt}</span>
             <button
               className="font-medium text-[#17352B] underline decoration-[#17352B]/35 underline-offset-4 hover:decoration-[#17352B] focus:outline-none focus:ring-2 focus:ring-[#17352B]"
