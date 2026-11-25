@@ -7,7 +7,6 @@ import {
   interiorServiceGalleryOneImages,
   interiorServiceGalleryTwoImages,
 } from "@/app/gallery/interior/galleryFiles";
-import ReviewsWidget from "../../components/ReviewsWidget";
 
 const serviceJsonLd = {
   "@context": "https://schema.org",
@@ -102,20 +101,11 @@ export default function InteriorPaintingPage() {
             Interior Residential Painting
           </h1>
           <p className="pb-4 pt-4">
-            Looking for top-quality interior painting services in Portland,
-            Oregon? Look no further than Portland Painting and Restoration. With
-            our team of skilled professionals and a commitment to excellence, we
-            are your go-to choice for transforming the interior of your home or
-            business.
-          </p>
-          <p className="pb-4 pt-4">
-            At Portland Painting and Restoration, we understand that the
-            interior of your property is a reflection of your style and
-            personality. Whether you’re looking to refresh the walls with a new
-            coat of paint or completely revamp the color scheme. In addition to our
-            exceptional painting services, we also offer comprehensive carpentry
-            services to enhance your interior further, ensuring that every
-            detail of your space is crafted to perfection.
+            From simple color updates to more extensive interior improvements,
+            a successful project goes beyond the finished product. Our skilled
+            painters and dedicated operations team work together to deliver
+            quality workmanship, clear communication, and a well-managed
+            project from start to finish.
           </p>
         </div>
       </div>
@@ -214,10 +204,6 @@ export default function InteriorPaintingPage() {
           with our expert craftsmanship and exceptional service.
         </p>
       </div>
-      <ReviewsWidget
-        title="Interior Painting Reviews"
-        className="bg-gray-50"
-      />
     </>
   );
 }

@@ -79,15 +79,19 @@ export default function HomePage() {
             }}
             className="font-sans font-medium text-4xl lg:text-7xl leading-[1.2]"
           >
-            Transform or Restore your space with our painting and carpentry experts.
+            Painting. Carpentry. Restoration.
           </h1>
+          <p className="mt-4 font-sans text-xl leading-relaxed lg:text-3xl">
+            Expert repairs, preparation, and finishes throughout the Greater
+            Portland Area
+          </p>
         </div>
 
         <Banner
           ctaLink="/estimate"
           imagePath="/herobanner.webp"
           cta="Get Estimate"
-          description="Portland Painting and Restoration is one of Portland and Vancouver’s premier repair, light remodel, and finish contractors."
+          description="Portland Painting & Restoration is a premier paint, repair, and light remodel contractor, serving the Greater Portland and Vancouver area."
         />
 
         <About />
