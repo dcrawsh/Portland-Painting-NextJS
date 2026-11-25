@@ -160,8 +160,7 @@ const About = () => {
           <StatCard>
             <h4>20+ Years</h4>
             <p>
-              <strong>Serving the Portland Area</strong> with quality
-              restoration since 2004.
+              <strong>Serving the Greater Portland area</strong> since 2004.
             </p>
           </StatCard>
 
@@ -176,8 +175,8 @@ const About = () => {
           <StatCard>
             <h4>2500+ Projects</h4>
             <p>
-              <strong>Completed Renovations</strong> that transform homes and
-              businesses.
+              <strong>Completed Projects</strong> that transformed homes, HOAs,
+              and businesses.
             </p>
           </StatCard>
         </StatsContainer>

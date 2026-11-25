@@ -11,6 +11,7 @@ export default function Nav() {
   const [servicesOpen, setServicesOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
 
   const pathname = usePathname();
 
@@ -20,6 +21,7 @@ export default function Nav() {
     setServicesOpen(false);
     setAboutOpen(false);
     setGalleryOpen(false);
+    setResourcesOpen(false);
   }, [pathname]);
 
   const toggleMenu = () => {
@@ -29,6 +31,7 @@ export default function Nav() {
       setServicesOpen(false);
       setAboutOpen(false);
       setGalleryOpen(false);
+      setResourcesOpen(false);
     }
   };
 
@@ -43,11 +46,15 @@ export default function Nav() {
   ].includes(pathname);
 
   const isAboutActive =
-    pathname === "/about-us" || pathname.startsWith("/about-us/");
+    pathname === "/about-us" ||
+    pathname === "/contact" ||
+    pathname.startsWith("/about-us/");
 
   const isGalleryActive = ["/gallery/interior", "/gallery/exterior"].includes(
     pathname
   );
+
+  const isResourcesActive = pathname === "/save-the-planet";
 
   return (
     <>
@@ -107,7 +114,7 @@ export default function Nav() {
                 </span>
               </Link>
               {/* Hover dropdown */}
-              <div className="hidden group-hover:block absolute top-full left-0 w-48 bg-white shadow-md rounded-md p-2 mt-0 border border-gray-200 z-20">
+              <div className="hidden group-hover:block group-focus-within:block absolute top-full left-0 w-48 bg-white shadow-md rounded-md p-2 mt-0 border border-gray-200 z-20">
                 <Link
                   href="/painting/interior"
                   className={`block px-4 py-2 hover:bg-gray-100 rounded-md transition ${pathname === "/painting/interior" ? "text-black" : ""
@@ -172,7 +179,7 @@ export default function Nav() {
                 </span>
               </Link>
               {/* Hover dropdown */}
-              <div className="hidden group-hover:block absolute top-full left-0 w-48 bg-white shadow-md rounded-md p-2 mt-0 border border-gray-200 z-20">
+              <div className="hidden group-hover:block group-focus-within:block absolute top-full left-0 w-48 bg-white shadow-md rounded-md p-2 mt-0 border border-gray-200 z-20">
                 <Link
                   href="/gallery/interior"
                   className={`block px-4 py-2 hover:bg-gray-100 rounded-md transition ${pathname === "/gallery/interior" ? "text-black" : ""
@@ -208,7 +215,13 @@ export default function Nav() {
                   />
                 </span>
               </Link>
-              <div className="hidden group-hover:block absolute top-full left-0 w-48 bg-white shadow-md rounded-md p-2 mt-0 border border-gray-200 z-20">
+              <div className="hidden group-hover:block group-focus-within:block absolute top-full left-0 w-48 bg-white shadow-md rounded-md p-2 mt-0 border border-gray-200 z-20">
+                <Link
+                  href="/contact"
+                  className="block px-4 py-2 hover:bg-gray-100 rounded-md transition"
+                >
+                  Contact
+                </Link>
                 <Link
                   href="/about-us/employment"
                   className="block px-4 py-2 hover:bg-gray-100 rounded-md transition"
@@ -230,23 +243,33 @@ export default function Nav() {
               </div>
             </li>
 
-            <li>
-              <Link
-                href="/contact"
-                className={`hover:text-black transition ${pathname === "/contact" ? "text-black" : ""
+            <li className="group relative">
+              <button
+                type="button"
+                aria-haspopup="true"
+                className={`hover:text-black transition flex items-center ${isResourcesActive ? "text-black" : ""
                   }`}
               >
-                Contact
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/save-the-planet"
-                className={`hover:text-black transition ${pathname === "/save-the-planet" ? "text-green-500" : ""
-                  }`}
-              >
-                Save The Planet
-              </Link>
+                Resources
+                <span className="ml-1 text-sm">
+                  <Image
+                    src="/smallArrow.svg"
+                    width={16}
+                    height={16}
+                    unoptimized
+                    alt=""
+                  />
+                </span>
+              </button>
+              <div className="hidden group-hover:block group-focus-within:block absolute top-full right-0 w-48 bg-white shadow-md rounded-md p-2 mt-0 border border-gray-200 z-20">
+                <Link
+                  href="/save-the-planet"
+                  className={`block px-4 py-2 hover:bg-gray-100 rounded-md transition ${pathname === "/save-the-planet" ? "text-black" : ""
+                    }`}
+                >
+                  Save The Planet
+                </Link>
+              </div>
             </li>
           </ul>
 
@@ -496,9 +519,18 @@ export default function Nav() {
                 </span>
               </button>
               <ul
-                className={`mt-2 ml-4 space-y-2 overflow-hidden transition-all duration-300 ${aboutOpen ? "max-h-40" : "max-h-0"
+                className={`mt-2 ml-4 space-y-2 overflow-hidden transition-all duration-300 ${aboutOpen ? "max-h-56" : "max-h-0"
                   }`}
               >
+                <li>
+                  <Link
+                    href="/contact"
+                    onClick={toggleMenu}
+                    className="block px-2 py-1 rounded-md hover:bg-gray-100"
+                  >
+                    Contact
+                  </Link>
+                </li>
                 <li>
                   <Link
                     href="/about-us/employment"
@@ -530,25 +562,40 @@ export default function Nav() {
             </li>
 
             <li>
-              <Link
-                href="/contact"
-                onClick={toggleMenu}
-                className={`block transition ${pathname === "/contact" ? "text-black" : ""
+              <button
+                type="button"
+                onClick={() => setResourcesOpen((open) => !open)}
+                aria-expanded={resourcesOpen}
+                className={`flex items-center justify-between w-full text-left transition ${isResourcesActive ? "text-black" : ""
                   }`}
               >
-                Contact
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/save-the-planet"
-                onClick={toggleMenu}
-                className={`block transition ${pathname === "/save-the-planet" ? "text-green-500" : ""
+                <span>Resources</span>
+                <span className="ml-2 text-sm">
+                  <Image
+                    className={resourcesOpen ? "rotate-180" : ""}
+                    src="/smallArrow.svg"
+                    width={16}
+                    height={16}
+                    unoptimized
+                    alt=""
+                  />
+                </span>
+              </button>
+              <ul
+                className={`mt-2 ml-4 space-y-2 overflow-hidden transition-all duration-300 ${resourcesOpen ? "max-h-20" : "max-h-0"
                   }`}
               >
-                Save The Planet
-              </Link>
-
+                <li>
+                  <Link
+                    href="/save-the-planet"
+                    onClick={toggleMenu}
+                    className={`block px-2 py-1 rounded-md hover:bg-gray-100 ${pathname === "/save-the-planet" ? "text-black" : ""
+                      }`}
+                  >
+                    Save The Planet
+                  </Link>
+                </li>
+              </ul>
             </li>
           </ul>
 

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,7 +12,7 @@ interface ServiceCardProps {
   image?: string;
   isactive?: boolean;
   secondImage?: string;
-  handleCardClick?: (e: any) => void;
+  handleCardClick?: (e: MouseEvent<HTMLDivElement>) => void;
 }
 
 const toCssImageUrl = (image?: string) => {
