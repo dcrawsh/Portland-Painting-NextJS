@@ -197,8 +197,8 @@ export default function PortfolioGallery({
       aria-label={`${label} gallery`}
       className={
         embedded
-          ? "border-b border-[#20231F]/15 py-8"
-          : "mx-auto max-w-6xl px-6 pb-16 lg:px-20"
+          ? "min-w-0 max-w-full overflow-x-hidden border-b border-[#20231F]/15 py-8"
+          : "mx-auto w-full min-w-0 max-w-[100vw] overflow-x-hidden px-6 pb-16 lg:max-w-6xl lg:px-20"
       }
       id={embedded ? undefined : "portfolio-gallery"}
     >
@@ -297,7 +297,7 @@ export default function PortfolioGallery({
 
       {galleryImages.length > 1
         ? renderThumbnailRail(
-            "mt-5 flex gap-3 overflow-x-auto pb-2 lg:hidden [&>button]:w-24",
+            "mt-5 flex w-full min-w-0 max-w-full gap-3 overflow-x-auto pb-2 lg:hidden [&>button]:w-24",
             mobileThumbnailRefs,
             mobileRailRef
           )

@@ -1,8 +1,8 @@
 
 import type { Metadata } from "next";
 import Image from "next/image";
-import imageFiles from "./galleryFiles";
 import PortfolioGallery from "../../components/ImageGallery/PortfolioGallery";
+import { getGalleryImages } from "@/lib/gallery-data";
 import Link from "next/link";
 import Script from "next/script";
 
@@ -11,25 +11,6 @@ const toAbsoluteImage = (path: string) =>
     /\s/g,
     "%20"
   );
-
-const galleryJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "@id": "https://www.paintpdx.com/gallery/exterior#collection",
-  name: "Exterior Painting Gallery",
-  description:
-    "A portfolio of exterior painting and carpentry projects completed across Portland and Vancouver.",
-  url: "https://www.paintpdx.com/gallery/exterior",
-  hasPart: imageFiles.slice(0, 12).map((image, index) => {
-    const absoluteUrl = toAbsoluteImage(image);
-    return {
-      "@type": "ImageObject",
-      "@id": `${absoluteUrl}#image-${index + 1}`,
-      contentUrl: absoluteUrl,
-      representativeOfPage: index === 0,
-    };
-  }),
-};
 
 export const metadata: Metadata = {
   title: "Exterior Gallery | Portland Painting & Restoration",
@@ -65,6 +46,26 @@ export const metadata: Metadata = {
 };
 
 export default async function ExteriorGalleryPage() {
+  const galleryImages = await getGalleryImages("exterior");
+  const galleryJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": "https://www.paintpdx.com/gallery/exterior#collection",
+    name: "Exterior Painting Gallery",
+    description:
+      "A portfolio of exterior painting and carpentry projects completed across Portland and Vancouver.",
+    url: "https://www.paintpdx.com/gallery/exterior",
+    hasPart: galleryImages.slice(0, 12).map((image, index) => {
+      const absoluteUrl = toAbsoluteImage(image.src);
+      return {
+        "@type": "ImageObject",
+        "@id": `${absoluteUrl}#image-${index + 1}`,
+        contentUrl: absoluteUrl,
+        representativeOfPage: index === 0,
+      };
+    }),
+  };
+
   return (
     <>
       <Script async id="exterior-gallery-ld-json" type="application/ld+json">
@@ -104,7 +105,7 @@ export default async function ExteriorGalleryPage() {
           <p className="pb-4 pt-4">At Portland Painting and Restoration, we excel in both exterior painting and carpentry services to protect and beautify your property. Our professional painters deliver a consistent, durable finish that withstands the Pacific Northwest’s challenging weather. Simultaneously, our skilled carpenters address any structural issues, ensuring your exterior is not only visually stunning but also robust and secure.</p>
         </div>
       </div>
-      <PortfolioGallery images={imageFiles} label="Exterior painting project" />
+      <PortfolioGallery images={galleryImages} label="Exterior painting project" />
     </>
   );
 }
