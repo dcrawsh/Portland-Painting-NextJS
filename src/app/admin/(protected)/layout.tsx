@@ -22,6 +22,7 @@ export default async function ProtectedAdminLayout({
             </p>
             <nav className="mt-2 flex gap-4 text-sm font-medium text-[#17352B]">
               <Link className="underline-offset-4 hover:underline" href="/admin/projects">Projects</Link>
+              <Link className="underline-offset-4 hover:underline" href="/admin/gallery">Gallery</Link>
               <Link className="underline-offset-4 hover:underline" href="/admin/resources">Resources</Link>
             </nav>
           </div>

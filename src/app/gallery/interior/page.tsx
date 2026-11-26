@@ -1,5 +1,5 @@
-import imageFiles from "./galleryFiles";
 import PortfolioGallery from "../../components/ImageGallery/PortfolioGallery";
+import { getGalleryImages } from "@/lib/gallery-data";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
@@ -9,25 +9,6 @@ const toAbsoluteImage = (path: string) =>
     /\s/g,
     "%20"
   );
-
-const galleryJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "@id": "https://www.paintpdx.com/gallery/interior#collection",
-  name: "Interior Painting Gallery",
-  description:
-    "A portfolio of interior painting projects completed by Portland Painting & Restoration.",
-  url: "https://www.paintpdx.com/gallery/interior",
-  hasPart: imageFiles.slice(0, 12).map((image, index) => {
-    const absoluteUrl = toAbsoluteImage(image);
-    return {
-      "@type": "ImageObject",
-      "@id": `${absoluteUrl}#image-${index + 1}`,
-      contentUrl: absoluteUrl,
-      representativeOfPage: index === 0,
-    };
-  }),
-};
 
 export const metadata = {
   title: "Interior Gallery | Portland Painting & Restoration",
@@ -64,6 +45,26 @@ export const metadata = {
 };
 
 export default async function InteriorGalleryPage() {
+  const galleryImages = await getGalleryImages("interior");
+  const galleryJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": "https://www.paintpdx.com/gallery/interior#collection",
+    name: "Interior Painting Gallery",
+    description:
+      "A portfolio of interior painting projects completed by Portland Painting & Restoration.",
+    url: "https://www.paintpdx.com/gallery/interior",
+    hasPart: galleryImages.slice(0, 12).map((image, index) => {
+      const absoluteUrl = toAbsoluteImage(image.src);
+      return {
+        "@type": "ImageObject",
+        "@id": `${absoluteUrl}#image-${index + 1}`,
+        contentUrl: absoluteUrl,
+        representativeOfPage: index === 0,
+      };
+    }),
+  };
+
   return (
     <>
       <Script async id="interior-gallery-ld-json" type="application/ld+json">
@@ -103,7 +104,7 @@ export default async function InteriorGalleryPage() {
           <p className="pb-4 pt-4"> At Portland Painting and Restoration, we excel in both exterior painting and carpentry services to protect and beautify your property. Our professional painters deliver a consistent, durable finish that withstands the Pacific Northwest’s challenging weather. Simultaneously, our skilled carpenters address any structural issues, ensuring your exterior is not only visually stunning but also robust and secure. </p>
         </div>
       </div>
-      <PortfolioGallery images={imageFiles} label="Interior painting project" />
+      <PortfolioGallery images={galleryImages} label="Interior painting project" />
     </>
   );
 }

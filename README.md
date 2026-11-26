@@ -67,6 +67,20 @@ them to WebP, removes embedded metadata, and uploads them directly to the
 Add a short, useful image description to every photo before uploading. HEIC
 files and drag-to-reorder are not supported yet.
 
+The protected **Gallery** area manages the interior and exterior gallery pages.
+Each gallery continues using its checked-in image list until an administrator
+chooses **Start managing this gallery**. That imports the current order as
+database records. Administrators can then add optimized WebP photos, edit image
+descriptions, move photos earlier or later, and remove them from the public
+gallery. New files are stored in the public `gallery-images` bucket; the admin
+session and server-generated signed upload URLs protect write operations.
+
+To seed a new Supabase project with the current checked-in galleries, apply the
+gallery CMS migration and run `yarn gallery:import` once. The importer uses the
+standard Supabase variables in `.env`, preserves the current photo order,
+converts each source image to WebP, and refuses to overwrite a gallery that has
+already been edited through the CMS.
+
 The Resource & Information Center follows the same draft and publishing model.
 Its pages are HTML-first, with optional photography, PDF downloads, and links
 back to related service pages. While the section is in beta, resource routes

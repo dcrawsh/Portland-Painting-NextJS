@@ -9,6 +9,77 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      gallery_collections: {
+        Row: {
+          cms_enabled: boolean;
+          created_at: string;
+          gallery_key: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          cms_enabled?: boolean;
+          created_at?: string;
+          gallery_key: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          cms_enabled?: boolean;
+          created_at?: string;
+          gallery_key?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      gallery_images: {
+        Row: {
+          alt_text: string;
+          created_at: string;
+          gallery_key: string;
+          height: number | null;
+          id: number;
+          image_url: string | null;
+          sort_order: number;
+          storage_path: string | null;
+          updated_at: string;
+          width: number | null;
+        };
+        Insert: {
+          alt_text: string;
+          created_at?: string;
+          gallery_key: string;
+          height?: number | null;
+          id?: never;
+          image_url?: string | null;
+          sort_order?: number;
+          storage_path?: string | null;
+          updated_at?: string;
+          width?: number | null;
+        };
+        Update: {
+          alt_text?: string;
+          created_at?: string;
+          gallery_key?: string;
+          height?: number | null;
+          id?: never;
+          image_url?: string | null;
+          sort_order?: number;
+          storage_path?: string | null;
+          updated_at?: string;
+          width?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "gallery_images_gallery_key_fkey";
+            columns: ["gallery_key"];
+            isOneToOne: false;
+            referencedRelation: "gallery_collections";
+            referencedColumns: ["gallery_key"];
+          },
+        ];
+      };
       project_stories: {
         Row: {
           approach: string | null;
@@ -175,3 +246,7 @@ export type ProjectStoryImage =
   Database["public"]["Tables"]["project_story_images"]["Row"];
 export type ResourcePage =
   Database["public"]["Tables"]["resource_pages"]["Row"];
+export type GalleryCollection =
+  Database["public"]["Tables"]["gallery_collections"]["Row"];
+export type GalleryImage =
+  Database["public"]["Tables"]["gallery_images"]["Row"];

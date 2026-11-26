@@ -8,6 +8,7 @@
   },
   "scripts": {
     "admin:setup": "node scripts/generate-admin-secrets.mjs",
+    "gallery:import": "node scripts/import-gallery-to-supabase.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
