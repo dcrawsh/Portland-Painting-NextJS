@@ -70,7 +70,7 @@ export default async function AdminGalleryPage({
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12">
+    <main className="mx-auto w-full max-w-[100rem] px-4 py-10 sm:px-6 lg:px-8">
       <header className="border-b border-[#20231F]/20 pb-8">
         <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#687760]">
           Website photography

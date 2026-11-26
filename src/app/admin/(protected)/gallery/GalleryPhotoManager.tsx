@@ -4,7 +4,13 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import type { GalleryKey } from "@/lib/gallery";
 import type { GalleryImage } from "@/types/supabase";
 import { useRouter } from "next/navigation";
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import {
+  type ChangeEvent,
+  type DragEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   createSignedGalleryImageUpload,
   deleteGalleryImage,
@@ -119,6 +125,9 @@ export default function GalleryPhotoManager({
 }: GalleryPhotoManagerProps) {
   const router = useRouter();
   const pendingPhotosRef = useRef<PendingPhoto[]>([]);
+  const orderedImagesRef = useRef(images);
+  const dragSnapshotRef = useRef<GalleryImageWithUrl[] | null>(null);
+  const draggedImageIdRef = useRef<number | null>(null);
   const [orderedImages, setOrderedImages] = useState(images);
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
   const [descriptionDrafts, setDescriptionDrafts] = useState<
@@ -127,6 +136,8 @@ export default function GalleryPhotoManager({
   const [isProcessing, setIsProcessing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isReordering, setIsReordering] = useState(false);
+  const [draggedImageId, setDraggedImageId] = useState<number | null>(null);
+  const [dragOverImageId, setDragOverImageId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [savingId, setSavingId] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -137,6 +148,7 @@ export default function GalleryPhotoManager({
   }, [pendingPhotos]);
 
   useEffect(() => {
+    orderedImagesRef.current = images;
     setOrderedImages(images);
     setDescriptionDrafts((current) =>
       Object.fromEntries(
@@ -275,13 +287,11 @@ export default function GalleryPhotoManager({
     }
   }
 
-  async function moveImage(index: number, direction: -1 | 1) {
-    const nextIndex = index + direction;
-    if (nextIndex < 0 || nextIndex >= orderedImages.length) return;
-
-    const previous = orderedImages;
-    const next = [...orderedImages];
-    [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+  async function saveImageOrder(
+    next: GalleryImageWithUrl[],
+    previous: GalleryImageWithUrl[]
+  ) {
+    orderedImagesRef.current = next;
     setOrderedImages(next);
     setError(null);
     setMessage(null);
@@ -294,6 +304,7 @@ export default function GalleryPhotoManager({
     setIsReordering(false);
 
     if (!result.ok) {
+      orderedImagesRef.current = previous;
       setOrderedImages(previous);
       setError(result.error);
       return;
@@ -301,6 +312,83 @@ export default function GalleryPhotoManager({
 
     setMessage("Gallery order saved.");
     router.refresh();
+  }
+
+  async function moveImage(index: number, direction: -1 | 1) {
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= orderedImages.length) return;
+
+    const previous = orderedImages;
+    const next = [...orderedImages];
+    [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+    await saveImageOrder(next, previous);
+  }
+
+  function handleDragStart(
+    event: DragEvent<HTMLButtonElement>,
+    imageId: number
+  ) {
+    if (controlsDisabled) {
+      event.preventDefault();
+      return;
+    }
+
+    dragSnapshotRef.current = orderedImagesRef.current;
+    draggedImageIdRef.current = imageId;
+    setDraggedImageId(imageId);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(imageId));
+  }
+
+  function handleDragEnter(imageId: number) {
+    const activeId = draggedImageIdRef.current;
+    if (activeId === null || activeId === imageId || controlsDisabled) return;
+
+    const current = orderedImagesRef.current;
+    const fromIndex = current.findIndex((image) => image.id === activeId);
+    const targetIndex = current.findIndex((image) => image.id === imageId);
+    if (fromIndex < 0 || targetIndex < 0) return;
+
+    const next = [...current];
+    const [movedImage] = next.splice(fromIndex, 1);
+    next.splice(targetIndex, 0, movedImage);
+    orderedImagesRef.current = next;
+    setOrderedImages(next);
+    setDragOverImageId(imageId);
+  }
+
+  async function handleDrop(event: DragEvent<HTMLOListElement>) {
+    event.preventDefault();
+    const activeId = draggedImageIdRef.current;
+    const previous = dragSnapshotRef.current;
+    const next = orderedImagesRef.current;
+
+    draggedImageIdRef.current = null;
+    dragSnapshotRef.current = null;
+    setDraggedImageId(null);
+    setDragOverImageId(null);
+
+    if (
+      activeId === null ||
+      !previous ||
+      previous.every((image, index) => image.id === next[index]?.id)
+    ) {
+      return;
+    }
+
+    await saveImageOrder(next, previous);
+  }
+
+  function handleDragEnd() {
+    if (draggedImageIdRef.current !== null && dragSnapshotRef.current) {
+      orderedImagesRef.current = dragSnapshotRef.current;
+      setOrderedImages(dragSnapshotRef.current);
+    }
+
+    draggedImageIdRef.current = null;
+    dragSnapshotRef.current = null;
+    setDraggedImageId(null);
+    setDragOverImageId(null);
   }
 
   async function saveDescription(image: GalleryImageWithUrl) {
@@ -353,8 +441,9 @@ export default function GalleryPhotoManager({
             Gallery photos
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#20231F]/65">
-            Move photos with the arrow buttons. New uploads are resized, converted
-            to WebP, and stripped of embedded metadata.
+            Drag photos into order, or use the arrow buttons from a keyboard.
+            New uploads are resized, converted to WebP, and stripped of embedded
+            metadata.
           </p>
         </div>
         <p className="font-mono text-xs uppercase tracking-[0.12em] text-[#687760]">
@@ -363,9 +452,23 @@ export default function GalleryPhotoManager({
       </div>
 
       {orderedImages.length > 0 ? (
-        <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <ol
+          className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6"
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={handleDrop}
+        >
           {orderedImages.map((image, index) => (
-            <li className="border border-[#20231F]/20 bg-white p-3" key={image.id}>
+            <li
+              className={`border bg-white p-2 transition [contain-intrinsic-size:0_260px] [content-visibility:auto] ${
+                draggedImageId === image.id
+                  ? "border-[#17352B] opacity-45"
+                  : dragOverImageId === image.id
+                    ? "border-[#A84F36] ring-2 ring-[#A84F36]/20"
+                    : "border-[#20231F]/20"
+              }`}
+              key={image.id}
+              onDragEnter={() => handleDragEnter(image.id)}
+            >
               <div className="aspect-[4/3] overflow-hidden bg-[#E5DFD3]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -377,12 +480,28 @@ export default function GalleryPhotoManager({
                   width={image.width ?? 1200}
                 />
               </div>
-              <div className="mt-3 flex items-center justify-between gap-3">
-                <span className="font-mono text-xs text-[#687760]">#{index + 1}</span>
-                <div className="flex gap-2">
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    aria-label={`Drag photo ${index + 1} to a new position`}
+                    className="cursor-grab border border-[#20231F]/25 px-2 py-1 font-mono text-xs text-[#17352B] active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-35"
+                    disabled={controlsDisabled}
+                    draggable={!controlsDisabled}
+                    onDragEnd={handleDragEnd}
+                    onDragStart={(event) => handleDragStart(event, image.id)}
+                    title="Drag to reorder"
+                    type="button"
+                  >
+                    ⠿
+                  </button>
+                  <span className="font-mono text-xs text-[#687760]">
+                    #{index + 1}
+                  </span>
+                </div>
+                <div className="flex gap-1">
                   <button
                     aria-label={`Move photo ${index + 1} earlier`}
-                    className="border border-[#20231F]/25 px-3 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-35"
+                    className="border border-[#20231F]/25 px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-35"
                     disabled={controlsDisabled || index === 0}
                     onClick={() => moveImage(index, -1)}
                     type="button"
@@ -391,7 +510,7 @@ export default function GalleryPhotoManager({
                   </button>
                   <button
                     aria-label={`Move photo ${index + 1} later`}
-                    className="border border-[#20231F]/25 px-3 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-35"
+                    className="border border-[#20231F]/25 px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-35"
                     disabled={controlsDisabled || index === orderedImages.length - 1}
                     onClick={() => moveImage(index, 1)}
                     type="button"
@@ -400,44 +519,52 @@ export default function GalleryPhotoManager({
                   </button>
                 </div>
               </div>
-              <label className="mt-3 block text-sm font-medium" htmlFor={`gallery-alt-${image.id}`}>
-                Image description
-              </label>
-              <textarea
-                className="mt-2 w-full border border-[#20231F]/30 px-3 py-2 text-sm leading-5 outline-none focus:border-[#17352B] focus:ring-2 focus:ring-[#17352B]/20"
-                id={`gallery-alt-${image.id}`}
-                maxLength={240}
-                onChange={(event) =>
-                  setDescriptionDrafts((current) => ({
-                    ...current,
-                    [image.id]: event.target.value,
-                  }))
-                }
-                rows={2}
-                value={descriptionDrafts[image.id] ?? image.alt_text}
-              />
-              <div className="mt-3 flex items-center justify-between gap-3">
-                <button
-                  className="border border-[#17352B] px-3 py-2 text-sm font-semibold text-[#17352B] disabled:cursor-not-allowed disabled:opacity-40"
-                  disabled={
-                    controlsDisabled ||
-                    (descriptionDrafts[image.id] ?? "").trim().length < 3 ||
-                    (descriptionDrafts[image.id] ?? "").trim() === image.alt_text
+              <details className="mt-2 border-t border-[#20231F]/15 pt-2">
+                <summary className="cursor-pointer text-xs font-semibold text-[#17352B]">
+                  Edit details
+                </summary>
+                <label
+                  className="mt-3 block text-xs font-medium"
+                  htmlFor={`gallery-alt-${image.id}`}
+                >
+                  Image description
+                </label>
+                <textarea
+                  className="mt-2 w-full border border-[#20231F]/30 px-2 py-2 text-xs leading-5 outline-none focus:border-[#17352B] focus:ring-2 focus:ring-[#17352B]/20"
+                  id={`gallery-alt-${image.id}`}
+                  maxLength={240}
+                  onChange={(event) =>
+                    setDescriptionDrafts((current) => ({
+                      ...current,
+                      [image.id]: event.target.value,
+                    }))
                   }
-                  onClick={() => saveDescription(image)}
-                  type="button"
-                >
-                  {savingId === image.id ? "Saving…" : "Save"}
-                </button>
-                <button
-                  className="text-sm font-medium text-[#7A3525] underline decoration-[#7A3525]/35 underline-offset-4 disabled:opacity-40"
-                  disabled={controlsDisabled}
-                  onClick={() => removeImage(image)}
-                  type="button"
-                >
-                  {deletingId === image.id ? "Removing…" : "Remove"}
-                </button>
-              </div>
+                  rows={3}
+                  value={descriptionDrafts[image.id] ?? image.alt_text}
+                />
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <button
+                    className="border border-[#17352B] px-2 py-1 text-xs font-semibold text-[#17352B] disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={
+                      controlsDisabled ||
+                      (descriptionDrafts[image.id] ?? "").trim().length < 3 ||
+                      (descriptionDrafts[image.id] ?? "").trim() === image.alt_text
+                    }
+                    onClick={() => saveDescription(image)}
+                    type="button"
+                  >
+                    {savingId === image.id ? "Saving…" : "Save"}
+                  </button>
+                  <button
+                    className="text-xs font-medium text-[#7A3525] underline decoration-[#7A3525]/35 underline-offset-4 disabled:opacity-40"
+                    disabled={controlsDisabled}
+                    onClick={() => removeImage(image)}
+                    type="button"
+                  >
+                    {deletingId === image.id ? "Removing…" : "Remove"}
+                  </button>
+                </div>
+              </details>
             </li>
           ))}
         </ol>
